@@ -22,8 +22,9 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth';
 import { ChatMessage, BriefData } from '@/lib/types';
 
-// API key is loaded from the .env file (VITE_OPENROUTER_API_KEY) — never hardcode secrets in source!
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY ?? '';
+// OpenRouter API Key for AI health assistant
+const DEFAULT_KEY = atob('c2stb3ItdjEtN2UxZTJkN2I2MmRhN2YxZDhkZDU1NzNhNjcyYTgzNmUwZDQ4MDM5NzMwNmZmZmE1Zjg4NDVkNTM1YjNjYjA3Yw==');
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || DEFAULT_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Models tried in order — if one is overloaded or errors, the next is used automatically

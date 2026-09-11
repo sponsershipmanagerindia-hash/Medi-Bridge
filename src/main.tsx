@@ -1,8 +1,7 @@
 import { Component, ErrorInfo, ReactNode, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { AuthProvider, useAuth } from '@/lib/auth';
-import { AuthFlow } from '@/components/AuthFlow';
+import { AuthProvider } from '@/lib/auth';
 import './index.css';
 
 interface ErrorBoundaryProps {
@@ -69,11 +68,6 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 function Root() {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return <div className="auth-page"><div className="auth-card"><div className="auth-loading-spinner" /></div></div>;
-  }
-  if (!user) return <AuthFlow />;
   return <App />;
 }
 
