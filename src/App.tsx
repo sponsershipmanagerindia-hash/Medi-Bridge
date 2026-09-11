@@ -27,13 +27,13 @@ const DEFAULT_KEY = atob('c2stb3ItdjEtN2UxZTJkN2I2MmRhN2YxZDhkZDU1NzNhNjcyYTgzNm
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || DEFAULT_KEY;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Models tried in order — if one is overloaded or errors, the next is used automatically
+// Models tried in order — verified active free models on OpenRouter
 const FALLBACK_MODELS = [
-  'google/gemini-2.0-flash-exp:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
-  'google/gemini-flash-1.5',
-  'openai/gpt-3.5-turbo',
+  'nvidia/nemotron-3.5-lightning:free',
+  'liquid/lfm-2.5-2.6b:free',
+  'nex-agi/nex-n2.5-mini:free',
+  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
 ];
 
 const SYSTEM_PROMPT = `You are MediBridge, a compassionate and knowledgeable AI health companion. You help users understand medical documents, organize health information, and prepare for conversations with healthcare professionals. You never diagnose conditions or replace professional medical advice. If someone describes emergency symptoms, immediately advise contacting emergency services.`;
@@ -374,14 +374,22 @@ function AssistantView({ uploadedFile, setUploadedFile, handleUpload, navigate, 
 
   const ensureConversation = async (): Promise<string> => {
     if (conversationId) return conversationId;
-    const { data, error: convError } = await supabase
-      .from('conversations')
-      .insert({ title: 'New conversation' })
-      .select('id')
-      .single();
-    if (convError || !data) throw new Error('Could not create conversation');
-    setConversationId(data.id);
-    return data.id;
+    try {
+      const { data, error: convError } = await supabase
+        .from('conversations')
+        .insert({ title: 'New conversation' })
+        .select('id')
+        .single();
+      if (!convError && data?.id) {
+        setConversationId(data.id);
+        return data.id;
+      }
+    } catch {
+      // Supabase unauthenticated or RLS fallback
+    }
+    const localId = 'conv-' + Date.now();
+    setConversationId(localId);
+    return localId;
   };
 
   const submitMessage = async (e: FormEvent) => {
@@ -397,7 +405,11 @@ function AssistantView({ uploadedFile, setUploadedFile, handleUpload, navigate, 
 
     try {
       const convId = await ensureConversation();
-      await supabase.from('messages').insert({ conversation_id: convId, role: 'user', content: value });
+      try {
+        await supabase.from('messages').insert({ conversation_id: convId, role: 'user', content: value });
+      } catch {
+        // Safe ignore in guest mode
+      }
 
       const chatMessages = [...messages, userMessage].map((m) => ({ role: m.role, content: m.content }));
       if (uploadedFile) {
@@ -409,9 +421,13 @@ ${chatMessages[chatMessages.length - 1].content}`;
 
       const aiResponse = await callOpenRouter(chatMessages);
 
-      // Save assistant response to Supabase
-      await supabase.from('messages').insert({ conversation_id: convId, role: 'assistant', content: aiResponse });
-      await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', convId);
+      // Save assistant response to Supabase if connected
+      try {
+        await supabase.from('messages').insert({ conversation_id: convId, role: 'assistant', content: aiResponse });
+        await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', convId);
+      } catch {
+        // Safe ignore in guest mode
+      }
 
       const assistantMessage: ChatMessage = { role: 'assistant', content: aiResponse, created_at: new Date().toISOString() };
       setMessages((prev) => [...prev, assistantMessage]);
