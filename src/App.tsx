@@ -208,40 +208,40 @@ function App() {
         <div className="workspace-label">Workspace</div>
         <nav className="main-nav" aria-label="Main navigation">
           {navItems.map(({ id, label, icon: NavIcon }) => (
-            <button key={id} className={`nav-item ${activeView === id ? 'active' : ''}`} onClick={() => navigate(id)}>
-              <NavIcon size={19} strokeWidth={activeView === id ? 2.5 : 2} />
+            <button key={id} className={`nav-item ${activeView === id ? 'active' : ''}`} aria-current={activeView === id ? 'page' : undefined} onClick={() => navigate(id)}>
+              <NavIcon size={19} strokeWidth={activeView === id ? 2.5 : 2} aria-hidden="true" />
               <span>{label}</span>
-              {id === 'appointments' && appointmentCount > 0 && <span className="nav-count">{appointmentCount}</span>}
+              {id === 'appointments' && appointmentCount > 0 && <span className="nav-count" aria-label={`${appointmentCount} appointments`}>{appointmentCount}</span>}
             </button>
           ))}
         </nav>
 
         <div className="sidebar-spacer" />
-        <div className="privacy-card">
-          <div className="privacy-icon"><LockKeyhole size={16} /></div>
+        <div className="privacy-card" role="region" aria-label="Privacy notice">
+          <div className="privacy-icon"><LockKeyhole size={16} aria-hidden="true" /></div>
           <div>
             <strong>Your information is yours</strong>
             <p>Private by design. You control what gets shared.</p>
           </div>
         </div>
-        <button className="nav-item settings-item" onClick={() => setShowSettings(true)}><Settings size={19} /><span>Settings</span></button>
-        <button className="profile-row" onClick={() => setShowSettings(true)}>
-          <div className="avatar">{initials}</div>
+        <button className="nav-item settings-item" aria-label="Open settings" onClick={() => setShowSettings(true)}><Settings size={19} aria-hidden="true" /><span>Settings</span></button>
+        <button className="profile-row" aria-label="User account profile" onClick={() => setShowSettings(true)}>
+          <div className="avatar" aria-hidden="true">{initials}</div>
           <div className="profile-copy"><strong>{displayName || 'Your account'}</strong><span>{user.email}</span></div>
-          <ChevronRight size={16} className="muted-icon" />
+          <ChevronRight size={16} className="muted-icon" aria-hidden="true" />
         </button>
       </aside>
 
-      {mobileNavOpen && <button className="sidebar-overlay" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />}
+      {mobileNavOpen && <button className="sidebar-overlay" aria-label="Close navigation overlay" onClick={() => setMobileNavOpen(false)} />}
 
-      <main className="main-content">
+      <main className="main-content" id="main-content" role="main">
         <header className="topbar">
-          <button className="icon-button menu-trigger" aria-label="Open menu" onClick={() => setMobileNavOpen(true)}><Menu size={21} /></button>
-          <div className="breadcrumb"><span>Workspace</span><ChevronRight size={15} /><strong>{navItems.find((item) => item.id === activeView)?.label}</strong></div>
+          <button className="icon-button menu-trigger" aria-label="Open menu" onClick={() => setMobileNavOpen(true)}><Menu size={21} aria-hidden="true" /></button>
+          <div className="breadcrumb"><span>Workspace</span><ChevronRight size={15} aria-hidden="true" /><strong>{navItems.find((item) => item.id === activeView)?.label}</strong></div>
           <div className="topbar-actions">
-            <button className="icon-button" aria-label="Search" onClick={() => navigate('assistant')}><Search size={19} /></button>
-            <button className="icon-button notification-button" aria-label="Notifications" onClick={() => navigate('appointments')}><Bell size={19} />{appointmentCount > 0 && <span />}</button>
-            <button className="top-avatar" onClick={() => setShowSettings(true)}>{initials}</button>
+            <button className="icon-button" aria-label="Search assistant" onClick={() => navigate('assistant')}><Search size={19} aria-hidden="true" /></button>
+            <button className="icon-button notification-button" aria-label={`Notifications ${appointmentCount > 0 ? `(${appointmentCount} pending)` : ''}`} onClick={() => navigate('appointments')}><Bell size={19} aria-hidden="true" />{appointmentCount > 0 && <span />}</button>
+            <button className="top-avatar" aria-label="Profile and settings" onClick={() => setShowSettings(true)}>{initials}</button>
           </div>
         </header>
 
@@ -298,17 +298,17 @@ function HomeView({ navigate, handleUpload, displayName, documents, appointments
         <div className="hero-art"><div className="pulse-ring"><HeartPulse size={32} /></div><div className="orbit-dot dot-a" /><div className="orbit-dot dot-b" /><div className="orbit-dot dot-c" /></div>
       </section>
 
-      <section className="quick-actions">
+      <section className="quick-actions" aria-label="Quick actions">
         <ActionCard icon={Upload} title="Explain a document" detail="Upload a report or prescription" tone="blue" onClick={() => document.getElementById('home-upload')?.click()} />
         <ActionCard icon={Stethoscope} title="Talk to a doctor" detail="Prepare for professional care" tone="green" onClick={() => navigate('care')} />
         <ActionCard icon={CalendarDays} title="Book an appointment" detail="Request a consultation" tone="amber" onClick={() => navigate('appointments')} />
-        <input id="home-upload" type="file" accept="image/*,.pdf" className="visually-hidden" onChange={handleUpload} />
+        <input id="home-upload" type="file" accept="image/*,.pdf" className="visually-hidden" aria-label="Upload a document or report" onChange={handleUpload} />
       </section>
 
-      <div className="section-heading"><div><span className="section-kicker">Your workspace</span><h3>Continue where you left off</h3></div><button className="text-button" onClick={() => navigate('brief')}>View Health Brief <ChevronRight size={16} /></button></div>
+      <div className="section-heading"><div><span className="section-kicker">Your workspace</span><h3>Continue where you left off</h3></div><button className="text-button" aria-label="View Health Brief" onClick={() => navigate('brief')}>View Health Brief <ChevronRight size={16} /></button></div>
       <section className="dashboard-grid">
         <div className="panel brief-preview-panel">
-          <div className="panel-header"><div className="panel-title"><div className="panel-icon icon-teal"><ClipboardList size={17} /></div><div><h4>Health Brief</h4><span>{briefItems > 0 ? `${briefItems} items organized` : 'Start building your brief'}</span></div></div><button className="icon-button small" onClick={() => navigate('brief')}><ArrowUpRight size={17} /></button></div>
+          <div className="panel-header"><div className="panel-title"><div className="panel-icon icon-teal"><ClipboardList size={17} /></div><div><h4>Health Brief</h4><span>{briefItems > 0 ? `${briefItems} items organized` : 'Start building your brief'}</span></div></div><button className="icon-button small" aria-label="Open Health Brief" onClick={() => navigate('brief')}><ArrowUpRight size={17} /></button></div>
           <div className="brief-progress"><div className="progress-track"><span style={{ width: `${briefPercent}%` }} /></div><strong>{briefPercent}%</strong><span>organized</span></div>
           <div className="brief-tags">
             <span><Check size={13} /> {documents.length} documents</span>
@@ -318,21 +318,21 @@ function HomeView({ navigate, handleUpload, displayName, documents, appointments
           </div>
         </div>
         <div className="panel appointment-preview-panel">
-          <div className="panel-header"><div className="panel-title"><div className="panel-icon icon-peach"><CalendarDays size={17} /></div><div><h4>Next appointment</h4><span>{upcoming ? upcoming.status === 'confirmed' ? 'Confirmed' : 'Pending request' : 'No appointments yet'}</span></div></div><button className="icon-button small" onClick={() => navigate('appointments')}><ArrowUpRight size={17} /></button></div>
+          <div className="panel-header"><div className="panel-title"><div className="panel-icon icon-peach"><CalendarDays size={17} /></div><div><h4>Next appointment</h4><span>{upcoming ? upcoming.status === 'confirmed' ? 'Confirmed' : 'Pending request' : 'No appointments yet'}</span></div></div><button className="icon-button small" aria-label="Open appointments" onClick={() => navigate('appointments')}><ArrowUpRight size={17} /></button></div>
           {upcoming ? (
             <div className="appointment-date">
               <div className="date-block"><span>{upcoming.appointment_date ? new Date(upcoming.appointment_date).toLocaleString('en-US', { month: 'short' }).toUpperCase() : 'TBD'}</span><strong>{upcoming.appointment_date ? new Date(upcoming.appointment_date).getDate() : '--'}</strong></div>
               <div><strong>{upcoming.doctor_name || 'Professional care conversation'}</strong><p>{upcoming.specialty} · {upcoming.consultation_type}</p></div>
             </div>
           ) : (
-            <div className="empty-state-small"><p>No appointments scheduled yet.</p><button className="text-button" onClick={() => navigate('appointments')}>Request one now <ArrowUpRight size={15} /></button></div>
+            <div className="empty-state-small"><p>No appointments scheduled yet.</p><button className="text-button" aria-label="Request appointment now" onClick={() => navigate('appointments')}>Request one now <ArrowUpRight size={15} /></button></div>
           )}
         </div>
       </section>
 
-      <div className="section-heading recent-heading"><div><span className="section-kicker">Your information</span><h3>Recent documents</h3></div>{documents.length > 0 && <button className="text-button" onClick={() => navigate('assistant')}>See all <ChevronRight size={16} /></button>}</div>
+      <div className="section-heading recent-heading"><div><span className="section-kicker">Your information</span><h3>Recent documents</h3></div>{documents.length > 0 && <button className="text-button" aria-label="See all documents" onClick={() => navigate('assistant')}>See all <ChevronRight size={16} /></button>}</div>
       {documents.length > 0 ? (
-        <section className="document-list">
+        <section className="document-list" aria-label="Recent documents list">
           {documents.slice(0, 5).map((doc) => (
             <DocumentRow key={doc.id} name={doc.file_name} type={doc.document_type} date={`Added ${new Date(doc.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`} status={doc.status === 'ready' ? 'Ready' : 'Uploaded'} onClick={() => navigate('assistant')} />
           ))}
@@ -342,8 +342,8 @@ function HomeView({ navigate, handleUpload, displayName, documents, appointments
           <div className="empty-state-icon"><FileText size={28} /></div>
           <h4>No documents yet</h4>
           <p>Upload a medical report, prescription, or discharge summary to get started.</p>
-          <button className="button button-primary" onClick={() => document.getElementById('home-upload')?.click()}><Upload size={17} /> Upload a document</button>
-          <input id="home-upload-empty" type="file" accept="image/*,.pdf" className="visually-hidden" onChange={handleUpload} />
+          <button className="button button-primary" aria-label="Upload a medical document" onClick={() => document.getElementById('home-upload')?.click()}><Upload size={17} /> Upload a document</button>
+          <input id="home-upload-empty" type="file" accept="image/*,.pdf" className="visually-hidden" aria-label="Upload document" onChange={handleUpload} />
         </div>
       )}
       <SafetyNote />
@@ -459,7 +459,7 @@ ${chatMessages[chatMessages.length - 1].content}`;
             </div>
           </div>
 
-          <div className="chat-messages">
+          <div className="chat-messages" role="log" aria-live="polite" aria-label="Conversation messages">
             {messages.map((msg, i) => (
               <div key={i} className={`message-row ${msg.role === 'user' ? 'message-user' : ''}`}>
                 <div className={`message-avatar ${msg.role === 'user' ? 'user-message-avatar' : ''}`}>
@@ -475,7 +475,7 @@ ${chatMessages[chatMessages.length - 1].content}`;
               </div>
             ))}
             {sending && (
-              <div className="message-row">
+              <div className="message-row" role="status" aria-label="MediBridge is analyzing">
                 <div className="message-avatar"><Sparkles size={15} /></div>
                 <div className="message-content">
                   <div className="message-meta"><strong>MediBridge</strong><span>thinking...</span></div>
@@ -486,11 +486,11 @@ ${chatMessages[chatMessages.length - 1].content}`;
             <div ref={messagesEndRef} />
           </div>
 
-          {error && <div className="chat-error"><AlertTriangle size={15} /> {error}</div>}
+          {error && <div className="chat-error" role="alert"><AlertTriangle size={15} /> {error}</div>}
 
-          <div className="suggestion-row">
+          <div className="suggestion-row" role="group" aria-label="Prompt suggestions">
             {promptSuggestions.map((prompt) => (
-              <button key={prompt} className="suggestion-chip" onClick={() => setDraft(prompt)} disabled={sending}>{prompt}</button>
+              <button key={prompt} className="suggestion-chip" aria-label={`Use prompt: ${prompt}`} onClick={() => setDraft(prompt)} disabled={sending}>{prompt}</button>
             ))}
           </div>
 
@@ -1008,7 +1008,7 @@ function ShareSheet({ onClose, brief }: { onClose: () => void; brief: BriefData 
     <div className="sheet-backdrop" onClick={onClose}>
       <div className="share-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <div className="sheet-header"><div><span className="section-kicker">Review before sharing</span><h2>Share Health Brief</h2></div><button className="icon-button" onClick={onClose}><X size={18} /></button></div>
+        <div className="sheet-header"><div><span className="section-kicker">Review before sharing</span><h2>Share Health Brief</h2></div><button className="icon-button" aria-label="Close share sheet" onClick={onClose}><X size={18} /></button></div>
         {hasData ? (
           <>
             <p>Select what you want to include. Nothing is shared automatically.</p>
